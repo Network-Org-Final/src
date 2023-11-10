@@ -1,27 +1,32 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Mon Oct 30 16:25:02 2023
-
-@author: georg
-"""
 import socket
+import threading
 
+def send_messages():
+    while True:
+        response = input()
+        server.send(bytes(response, 'utf-8'))
 
-Chatbox_Client=socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-Port = 1234
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+Port = 12342
 Host = socket.gethostname()
-Star_Rating=3
-Distance =input("How far away is your destination?")
-Chatbox_Client.connect((Host,Port))
-Chatbox_Client.send(bytes(Distance,'utf-8'))
+Star_Rating = 3  # Not sure what this is for, so leaving it as is
+server.connect((Host, Port))
+
+# Start a separate thread for sending messages
+thread = threading.Thread(target=send_messages)
+thread.start()
+
 while True:
-   #Takes input from client
-   print("If you would like to cancel the ride, text the word cancel.")
-   text=input("input text")
-   #Sends client input
-   Chatbox_Client.send(bytes(text,'utf-8'))
-   print(Chatbox_Client.recv(50))
-   #Breaks out of while look if text is bye
-   if text=="cancel":
+    # Continuously listen for messages from the server
+    try:
+        msg = server.recv(1024)
+        if not msg:
+            print("Disconnected from server")
+            break
+        message = msg.decode('utf-8')
+        print(message)
+    except ConnectionResetError:
+        print("Connection was lost with the server.")
         break
-Chatbox_Client.close()
+
+server.close()
