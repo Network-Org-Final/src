@@ -9,7 +9,6 @@ def send_messages():
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 Port = 12342
 Host = socket.gethostname()
-Star_Rating = 3  # Not sure what this is for, so leaving it as is
 server.connect((Host, Port))
 
 # Start a separate thread for sending messages
