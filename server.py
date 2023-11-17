@@ -1,8 +1,9 @@
 import threading
 import socket
+import time
 from threading import Lock
 host = '127.0.0.1' # local host
-port = 12342
+port = 1239
 
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 server.bind((host,port))
@@ -82,17 +83,34 @@ def handle_rider(rider):
     # Prompt rider for their destination(length)
     rider.send_message('What is the distance in miles for your trip? (In miles)')
     distance = rider.recieve_message()
+
     # Prompt rider for how long this should take
     rider.send_message('How long do you think this will take (HH:MM)')
     eta = rider.recieve_message()
 
-    # Send message to all drivers, maybe push this to a requested array so drivers who join after can see this 
-    send_message_to_driver((rider.name + 'has requested a ride of '+ distance + ' miles and should take' + eta + 'minutes.'))
-    # Wait 30 seconds or something if no response send message
-    # If a driver wants to take it run connect_clients() for them to enter a chatroom and negotiatie
+    requested[rider.name] = distance + ' miles and ' + eta + ' minutes'
 
 def handle_driver(driver):
-    driver.send_message(('Hello driver ' + driver.name))
+    previous_keys = []  # Set to keep track of the previous keys in the dictionary
+    driver.send_message('Hello driver ' + driver.name + '\n')
+
+    while True:
+        current_keys = list(requested.keys())
+        if current_keys != previous_keys:
+            if requested:
+                driver.send_message('The current pending trips are: \n')
+                for key, value in requested.items():
+                    driver.send_message(f'{key}: {value}\n')
+                
+                driver.send_message('To take one of these rides, simply enter the rider name and you will be placed in a chat room.')
+                rider_name = driver.recieve_message()
+
+                if rider_name in requested:
+                    
+            previous_keys = current_keys[:]
+
+        time.sleep(1)  # Sleep for a short period to prevent constant CPU usage
+        
     # Recieve requests from riders
     # Get to choose if they want to take a drive of the distance
     # If yes run connect_clients()
@@ -152,5 +170,7 @@ while True:
 
     shutdown = input('shutdown server y/n')
     if shutdown == 'y':
+        # This needs some fixing 
         server.close()
+        break
  
