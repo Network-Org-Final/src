@@ -17,3 +17,4 @@ Currently the project is set up to run locally on port 3007, to run this over th
 3. on cient.py change line 230 to your specific client machine IP by runnning ipconfig on windows or ifconfig on macos, this ip is used for the chatroom and is exchanged through 
     the main server.
 
+Demo: https://www.youtube.com/watch?v=LgZREpFJqrk&t=8s
